@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-import joblib
+import pickle
 import pandas as pd
 from model import predict_mental_health
 

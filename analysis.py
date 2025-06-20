@@ -6,10 +6,6 @@ import seaborn as sns
 # Read the dataset
 df = pd.read_csv('survey.csv')
 
-# Set style for better visualization
-plt.style.use('seaborn')
-sns.set_palette("husl")
-
 # 1. Descriptive Statistics
 print("\n=== Descriptive Statistics ===")
 print("\nBasic Statistics:")
@@ -95,6 +91,13 @@ plt.show()
 print("\n=== Additional Insights ===")
 
 # Treatment Rate by Country
+# If treatment is not numeric
+df['treatment'] = df['treatment'].map({'Yes': 1, 'No': 0})
+
+# Drop rows with missing data
+df = df.dropna(subset=['Country', 'treatment'])
+
+# Group and plot
 treatment_rate = df.groupby('Country')['treatment'].mean().sort_values(ascending=False)
 plt.figure(figsize=(12, 6))
 treatment_rate.head(10).plot(kind='bar')
@@ -114,4 +117,5 @@ print("\nKey Statistics:")
 print(f"Total number of respondents: {len(df)}")
 print(f"Percentage seeking treatment: {df['treatment'].mean()*100:.2f}%")
 print(f"Average age: {df['Age'].mean():.2f}")
+df['family_history'] = df['family_history'].map({'Yes': 1, 'No': 0})
 print(f"Percentage with family history: {df['family_history'].mean()*100:.2f}%") 
