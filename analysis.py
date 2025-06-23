@@ -2,17 +2,23 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from model import preprocess_data
 
-# Read the dataset
-df = pd.read_csv('survey.csv')
+# Read and preprocess the dataset
+raw_df = pd.read_csv('survey.csv')
+df, y, label_encoders, scaler, le_target = preprocess_data(raw_df)
+# For analysis, merge y back if needed:
+df['treatment'] = y
+
 
 # 1. Descriptive Statistics
-print("\n=== Descriptive Statistics ===")
+print("\n=== Descriptive Statistics (Preprocessed Data) ===")
 print("\nBasic Statistics:")
 print(df.describe())
 
 print("\nCategorical Variables Summary:")
-print(df.describe(include=['object']))
+print(df.describe(include=['object', 'int', 'float']))
+
 
 # 2. Univariate Analysis
 print("\n=== Univariate Analysis ===")
@@ -23,7 +29,9 @@ sns.histplot(data=df, x='Age', bins=30)
 plt.title('Age Distribution')
 plt.show()
 
+
 # Gender Distribution
+df = pd.read_csv("survey.csv")
 plt.figure(figsize=(10, 6))
 df['Gender'].value_counts().head(10).plot(kind='bar')
 plt.title('Top 10 Gender Categories')
@@ -49,14 +57,10 @@ df['treatment'].value_counts().plot(kind='pie', autopct='%1.1f%%')
 plt.title('Treatment Status')
 plt.show()
 
+
 # 3. Bivariate Analysis
 print("\n=== Bivariate Analysis ===")
 
-# Age vs Treatment
-plt.figure(figsize=(10, 6))
-sns.boxplot(data=df, x='treatment', y='Age')
-plt.title('Age Distribution by Treatment Status')
-plt.show()
 
 # Gender vs Treatment
 plt.figure(figsize=(10, 6))
@@ -87,22 +91,20 @@ sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', center=0)
 plt.title('Correlation Matrix of Numeric Variables')
 plt.show()
 
+
 # 5. Additional Insights
 print("\n=== Additional Insights ===")
 
-# Treatment Rate by Country
-# If treatment is not numeric
+df = pd.read_csv("survey.csv")
 df['treatment'] = df['treatment'].map({'Yes': 1, 'No': 0})
-
-# Drop rows with missing data
-df = df.dropna(subset=['Country', 'treatment'])
-
-# Group and plot
 treatment_rate = df.groupby('Country')['treatment'].mean().sort_values(ascending=False)
+
 plt.figure(figsize=(12, 6))
 treatment_rate.head(10).plot(kind='bar')
 plt.title('Treatment Rate by Country (Top 10)')
 plt.xticks(rotation=45)
+plt.ylabel('Treatment Rate (Proportion)')
+plt.tight_layout()
 plt.show()
 
 # Work Interference by Treatment Status
@@ -111,11 +113,3 @@ sns.countplot(data=df, x='work_interfere', hue='treatment')
 plt.title('Work Interference by Treatment Status')
 plt.xticks(rotation=45)
 plt.show()
-
-# Print some key statistics
-print("\nKey Statistics:")
-print(f"Total number of respondents: {len(df)}")
-print(f"Percentage seeking treatment: {df['treatment'].mean()*100:.2f}%")
-print(f"Average age: {df['Age'].mean():.2f}")
-df['family_history'] = df['family_history'].map({'Yes': 1, 'No': 0})
-print(f"Percentage with family history: {df['family_history'].mean()*100:.2f}%") 
