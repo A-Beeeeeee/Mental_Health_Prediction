@@ -109,11 +109,15 @@ best_model_name = ''
 
 print("\n=== Training and Evaluation of All Models ===")
 for name, model in all_models.items():
-    print(f"\nTraining {name}...")
+    print(f"\n--- {name} ---")
     model.fit(X_train, y_train)
     y_pred = model.predict(X_test)
+
     acc = accuracy_score(y_test, y_pred)
-    print(f"{name} Accuracy: {acc:.4f}")
+    print(f"Accuracy: {acc:.4f}")
+    print("Classification Report:\n", classification_report(y_test, y_pred, zero_division=0))
+    print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
+
     if acc > best_score:
         best_score = acc
         best_model = model
